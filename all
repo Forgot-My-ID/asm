@@ -1,0 +1,1345 @@
+; Write a progratn to read one of the hex digits A—Y, and display it on the next line in decimal.
+; Sample execution:
+; ENTER A HEX C
+; IN DECIMAL IT 12
+
+; YTHA YU - CHAPTER 4 EXERCISE 10
+.MODEL SMALL 
+
+.DATA
+PROMPT DB 'ENTER A HEX DIGIT: $'
+MSG DB 0AH, 0DH, 'IN DECIMAL IT IS 1' 
+INPUT DB ?,'$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY PROMPT   
+    LEA DX, PROMPT
+    MOV AH, 9
+    INT 21H
+    
+    ;READ THE HEX DIGIT
+    MOV AH, 1
+    INT 21H
+         
+    ;CONVERT TO DECIMAL
+    SUB AL, 11H
+         
+    ;STORE IN MEMORY
+    MOV INPUT, AL
+               
+    ;DISPLAY MESSAGE            
+    LEA DX, MSG
+    MOV AH, 9
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+;Write a program to display a x 10 solid box of asterisks.
+;Hint: declare a string in the data segment that specifies the box, and display it with INT 21h, function 9h.
+; YTHA YU - CHAPTER 4 EXERCISE 11
+.MODEL SMALL 
+
+.DATA
+FIRST_LINE DB '**********$'
+REST DB 0AH, 0DH, '**********$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY FIRST LINE
+    ;IT IS DIFFERENT CAUSE WE DONT WANT TO
+    ;PRINT A NEW LINE BEFORE THE FIRST LINE   
+    LEA DX, FIRST_LINE
+    MOV AH, 9
+    INT 21H
+               
+    ;DISPLAY THE REST            
+    LEA DX, REST
+    MOV AH, 9
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+; Write a program to (a) display "?"
+; (b) read three initials, 
+; (C) display them in the middle of an 11 x II box of asterisks, and
+; (d) beep the computer.
+; YTHA YU - CHAPTER 4 EXERCISE 12
+.MODEL SMALL 
+
+.DATA
+STARS DB 0AH, 0DH, '***********$'
+MIDDLE DB 0AH, 0DH, '****',?,?,?,'****$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY ?
+    MOV DL, '?'
+    MOV AH, 2
+    INT 21H
+    
+    ;INPUT FIRST INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IT
+    MOV MIDDLE+6, AL
+    
+    ;INPUT SECOND INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IT
+    MOV MIDDLE+7, AL
+    
+    ;INPUT THIRD INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IT
+    MOV MIDDLE+8, AL
+    
+    ;PRINT THE TOP HALF OF THE BOX
+    LEA DX, STARS
+    MOV AH, 9
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+             
+    ;PRINT THE MIDDLE LINE
+    LEA DX, MIDDLE
+    MOV AH, 9
+    INT 21H
+        
+    ;PRINT THE BOTTOM HALF OF THE BOX
+    LEA DX, STARS
+    MOV AH, 9
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H          
+    
+    ;BEEP SOUND
+    MOV DL,07H
+    MOV AH,2
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN; TAKES A SINGLE CHARACTER AS INPUT AND ECHOS IT
+.MODEL SMALL
+.STACK 100H
+.CODE 
+
+MAIN PROC        
+    ;READ A CHARACTER
+    MOV AH, 1           ;read single character function (the input character is stored in AL)
+    INT 21H
+    
+    ;DISPLAY CHARACTER
+    MOV AH, 2           ;display character function
+    MOV DL, AL          ;character is stored in AL
+    INT 21H             ;display the character stored in DL (the character is also stored in AL) 
+    
+    ;RETURN TO DOS
+    MOV AH, 4CH         ;DOS exit function
+    INT 21H             ;exit to DOS
+    
+MAIN ENDP                                           
+
+END MAIN; 7(b) - Ytha Yu
+; Read an uppercase letter (omit error checking), and display it at the next position on the same Une in lower case.
+.MODEL SMALL
+.STACK 100H
+.CODE 
+
+MAIN PROC        
+    ;READ AN UPPERCASE CHARACTER (omit error checking)
+    MOV AH, 1           ;read single character function (the input character is stored in AL)
+    INT 21H
+    
+    ; CONVERT TO LOWERCASE 
+    ADD AL, 20h
+    
+    ;DISPLAY CHARACTER                              
+    MOV DL, AL          ;character is stored in AL  
+    
+    MOV AH, 2           ;display character function
+    INT 21H             ;display the character stored in DL (the character is also stored in AL) 
+    
+    ;RETURN TO DOS
+    MOV AH, 4CH         ;DOS exit function
+    INT 21H             ;exit to DOS
+    
+MAIN ENDP                                           
+
+END MAIN; Write a program to (a) display a "?", (b) read two decimal digits whose sum is less than 10, (c) display them and their sum on the next line, with an appropriate message. Sample execution: ?27
+; THE SUM OF 2 RND 7 IS 9
+; YTHA YU - CHAPTER 4 EXERCISE 8
+.MODEL SMALL 
+
+.DATA
+MSG DB 0AH,0DH,'THE SUM OF '
+C1 DB ?,' AND '
+C2 DB ?,' IS '
+SUM DB ?,'$'
+
+.CODE
+MAIN PROC
+    mov ax,@data
+    mov ds,ax
+    
+    ;DISPLAY ?
+    MOV AH, 2
+    MOV DL, '?'
+    INT 21H
+    
+    ;READ THE FIRST DIGIT
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV C1, AL
+    
+    ;READ THE SECOND DIGIT
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV C2, AL  
+    
+    ;ADD THE TWO NUMBERS
+    ADD AL, C1
+    
+    ;CONVERT DIGIT TO STRING
+    SUB AL, 30H
+    
+    ;STORE RESULT
+    MOV SUM, AL
+               
+    ;GET MESSAGE START ADDRESS            
+    LEA DX, MSG
+    MOV AH, 9
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+;Write a program to (a) prompt the user. (b) iead first, middle, and
+;last initials of a person's natne, and (c) display them down the
+;left margin.
+;Sample execution:
+;ENTER THREE INZTIAI.S: JFK
+;J
+;F
+;K
+; YTHA YU - CHAPTER 4 EXERCISE 9
+.MODEL SMALL 
+
+.DATA
+MSG DB 'ENTER THREE INITIALS: $' 
+INPUT DB 0AH, 0DH, ?, 0AH, 0DH,?, 0AH, 0DH,?,'$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY MESSAGE   
+    LEA DX, MSG
+    MOV AH, 9
+    INT 21H
+    
+    ;READ THE FIRST INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV INPUT+2, AL
+                   
+    ;READ THE SECOND INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV INPUT+5, AL
+    
+    ;READ THE THIRD INITIAL
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV INPUT+8, AL
+               
+    ;GET MESSAGE START ADDRESS            
+    LEA DX, INPUT
+    MOV AH, 9
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+; Write a progratn to 
+; (a) display a "?. 
+; (b) lead two decimal digits whose sum is less than 10
+; (c) display them and their sutu on the next line, with an appropriate message. 
+; Sample execution:
+; ?27
+; THE SUM OF 2 AND 7 IS 9
+
+.MODEL SMALL 
+
+.DATA
+MSG DB 0AH,0DH,'THE SUM OF '
+C1 DB ?,' AND '
+C2 DB ?,' IS '
+SUM DB ?,'$'
+
+.CODE
+MAIN PROC
+    mov ax,@data
+    mov ds,ax
+    
+    ;DISPLAY ?
+    MOV AH, 2
+    MOV DL, '?'
+    INT 21H
+    
+    ;READ THE FIRST DIGIT
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV C1, AL
+    
+    ;READ THE SECOND DIGIT
+    MOV AH, 1
+    INT 21H
+    
+    ;STORE IN MEMORY
+    MOV C2, AL  
+    
+    ;ADD THE TWO NUMBERS
+    ADD AL, C1
+    
+    ;CONVERT DIGIT TO STRING
+    SUB AL, 30H
+    
+    ;STORE RESULT
+    MOV SUM, AL
+               
+    ;GET MESSAGE START ADDRESS            
+    LEA DX, MSG
+    MOV AH, 9
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+;Write a program to read one of the hex digits A-F, and display it on the next line in decimal.
+; ENTER A HEX DIGIT: C
+; IN DECIMAL IT IS: 12
+
+.MODEL SMALL 
+
+.DATA
+PROMPT DB 'ENTER A HEX DIGIT: $'
+MSG DB 0AH, 0DH, 'IN DECIMAL IT IS 1' 
+INPUT DB ?,'$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY PROMPT   
+    LEA DX, PROMPT
+    MOV AH, 9
+    INT 21H
+    
+    ;READ THE HEX DIGIT
+    MOV AH, 1
+    INT 21H
+         
+    ;CONVERT TO DECIMAL
+    SUB AL, 11H
+         
+    ;STORE IN MEMORY
+    MOV INPUT, AL
+               
+    ;DISPLAY MESSAGE            
+    LEA DX, MSG
+    MOV AH, 9
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+; Write a program to display a 10x10 solid box of asterisks. 
+; Hint: declare a string in the data segment that specifies the box, and display it with INT 21h, function 9h.
+
+.MODEL SMALL 
+
+.DATA
+FIRST_LINE DB '**********$'
+REST DB 0AH, 0DH, '**********$'
+
+.CODE
+MAIN PROC
+    MOV AX,@DATA
+    MOV DS,AX
+    
+    ;DISPLAY FIRST LINE
+    ;IT IS DIFFERENT CAUSE WE DONT WANT TO
+    ;PRINT A NEW LINE BEFORE THE FIRST LINE   
+    LEA DX, FIRST_LINE
+    MOV AH, 9
+    INT 21H
+               
+    ;DISPLAY THE REST            
+    LEA DX, REST
+    MOV AH, 9
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+    INT 21H
+   
+    ;RETURN TO DOS
+    MOV AH,4CH
+    INT 21H
+MAIN ENDP
+END MAIN
+; A = B - A using only MOV, ADD, SUB, INC, DEC and NEG
+DATA 	SEGMENT 
+A   DW  5h 
+B	DW	3h 
+DATA	ENDS
+
+CODE	SEGMENT 
+ASSUME	CS:CODE,DS:DATA 
+START: 
+        MOV AX, DATA  ;Set DS register 
+        MOV DS, AX 
+ 
+        MOV AX, A  ;Move variable values 
+        MOV BX, B
+        
+        SUB AX, B
+        
+        MOV word ptr [A], AX 
+ 
+        MOV AX,4C00H ;Return with 
+        INT 21H     ;return code zero 
+CODE ENDS 
+END START ; A = B - A using only MOV, ADD, SUB, INC, DEC and NEG
+
+DATA 	SEGMENT 
+A   DW  5h 
+DATA	ENDS
+
+CODE	SEGMENT 
+ASSUME	CS:CODE,DS:DATA 
+START: 
+        MOV AX, DATA  ;Set DS register 
+        MOV DS, AX 
+ 
+        MOV AX, A
+        
+        INC AX
+        
+        NEG AX 
+        
+        MOV WORD PTR [A], AX
+ 
+        MOV AX,4C00H ;Return with 
+        INT 21H     ;return code zero 
+CODE ENDS 
+END START ; C = A + B using only MOV, ADD, SUB, INC, DEC and NEG
+
+DATA 	SEGMENT 
+A   DW  5h
+B   DW  3h
+C   DW  ? 
+DATA	ENDS
+
+CODE	SEGMENT 
+ASSUME	CS:CODE,DS:DATA 
+START: 
+        MOV AX, DATA  ;Set DS register 
+        MOV DS, AX 
+ 
+        MOV AX, A
+        ADD AX, B
+        
+        MOV WORD PTR [C], AX
+ 
+        MOV AX,4C00H ;Return with 
+        INT 21H     ;return code zero 
+CODE ENDS 
+END START ; 512Ch + 4185h 
+; signed or unsigned overflow?
+
+MOV AX, 512Ch
+MOV BX, 4185h
+ADD AX, BX; 2143h - 1986h
+; signed or unsigned overflow?
+
+MOV AX, 2143h
+MOV BX, 1986h
+SUB AX, BX; Write a program for binary to decimal conversion
+
+; input8 bit binary number and print out decimal to screen.
+; zeros and ones -> decimal value
+
+ORG 100h
+
+; macro
+
+; this macro prints a char in AL and advances
+; the current cursor position:
+PUTC    MACRO   char
+        PUSH    AX
+        MOV     AL, char
+        MOV     AH, 0Eh
+        INT     10h     
+        POP     AX
+ENDM
+
+.data
+; null terminated input string:
+DB "0"
+s1 DB "00000000", 0
+sum DW 0  ; result.
+flag DB 0
+
+
+.code
+CALL print
+DB 0dh, 0ah, "8 bit binary: ", 0
+
+
+
+; get string:
+MOV DX, 9   ; buffer size (1+ for zero terminator).
+LEA DI, s1
+CALL GET_STRING
+
+
+; check that we really got 8 zeros and ones
+MOV CX, 8
+MOV SI, OFFSET s1
+check_s:
+        CMP [SI], 0 
+        JNE ok0         
+        MOV flag, 1     ; terminated.
+        JMP convert
+    ok0:
+        CMP [SI], 'b' 
+        JNE ok1         
+        MOV flag, 1     ; terminated.
+        JMP convert        
+    ok1:    
+        ; wrong digit? Not 1/0?
+        CMP [SI], 31h
+        JNA ok2
+        JMP error_not_valid     
+    ok2:
+        INC SI
+    LOOP check_s
+
+
+
+
+
+
+
+; start the conversion from string to value in SUM variable.
+convert:
+MOV BL, 1   ; multiplier.
+MOV CX, SI
+SUB CX, OFFSET s1
+DEC SI
+
+JCXZ stop_program
+
+next_digit:
+    MOV AL, [SI]  ; get digit.
+    SUB AL, 30h
+    MUL BL      ; no change to AX.
+    ADD SUM, AX
+    SHL BL, 1
+    DEC SI          ; go to previous digit.
+    LOOP next_digit
+
+; done! converted number is in SUM.
+
+; check if signed
+TEST sum, 0000_0000_1000_0000b
+JNZ  print_signed_unsigned
+
+print_unsigned:
+CALL print
+DB 0dh, 0ah, "decimal: ", 0
+MOV  AX, SUM
+CALL PRINT_NUM_UNS
+JMP  stop_program
+
+print_signed_unsigned:
+CALL print
+DB 0dh, 0ah, "unsigned decimal: ", 0
+; print out unsigned:
+MOV  AX, SUM
+CALL PRINT_NUM_UNS
+CALL print
+DB 0dh, 0ah, "signed decimal: ", 0
+; print out singed:
+MOV  AX, SUM
+CBW  ; convert byte into word.
+CALL PRINT_NUM
+JMP  stop_program
+
+
+error_not_valid:
+CALL print
+DB 0dh, 0ah, "error: only zeros and ones are allowed!", 0
+
+stop_program:
+
+; wait for any key....
+CALL print
+DB 0dh, 0ah, "press any key...", 0
+MOV AH, 0
+INT 16h
+RET
+
+
+; procedures
+
+
+
+; copied from c:\emu8086\emu8086.inc
+GET_STRING      PROC    NEAR
+PUSH    AX
+PUSH    CX
+PUSH    DI
+PUSH    DX
+
+MOV     CX, 0                   ; char counter.
+
+CMP     DX, 1                   ; buffer too small?
+JBE     empty_buffer            ;
+
+DEC     DX                      ; reserve space for last zero.
+
+
+;============================
+; loop to get and processes key presses:
+
+wait_for_key:
+
+MOV     AH, 0                   ; get pressed key.
+INT     16h
+
+CMP     AL, 13                  ; 'RETURN' pressed?
+JZ      exit
+
+
+CMP     AL, 8                   ; 'BACKSPACE' pressed?
+JNE     add_to_buffer
+JCXZ    wait_for_key            ; nothing to remove!
+DEC     CX
+DEC     DI
+PUTC    8                       ; backspace.
+PUTC    ' '                     ; clear position.
+PUTC    8                       ; backspace again.
+JMP     wait_for_key
+
+add_to_buffer:
+
+        CMP     CX, DX          ; buffer is full?
+        JAE     wait_for_key    ; if so wait for 'BACKSPACE' or 'RETURN'...
+
+        MOV     [DI], AL
+        INC     DI
+        INC     CX
+        
+        ; print the key:
+        MOV     AH, 0Eh
+        INT     10h
+
+JMP     wait_for_key
+;============================
+
+exit:
+
+; terminate by null:
+MOV     [DI], 0
+
+empty_buffer:
+
+POP     DX
+POP     DI
+POP     CX
+POP     AX
+RET
+GET_STRING      ENDP
+
+
+
+
+; copied from c:\emu8086\emu8086.inc
+PRINT_NUM       PROC    NEAR
+        PUSH    DX
+        PUSH    AX
+
+        CMP     AX, 0
+        JNZ     not_zero
+
+        PUTC    '0'
+        JMP     printed_pn
+
+not_zero:
+        ; the check SIGN of AX,
+        ; make absolute if it's negative:
+        CMP     AX, 0
+        JNS     positive
+        NEG     AX
+
+        PUTC    '-'
+
+positive:
+        CALL    PRINT_NUM_UNS
+printed_pn:
+        POP     AX
+        POP     DX
+        RET
+ENDP
+
+
+
+; copied from c:\emu8086\emu8086.inc
+PRINT_NUM_UNS   PROC    NEAR
+        PUSH    AX
+        PUSH    BX
+        PUSH    CX
+        PUSH    DX
+
+        ; flag to prevent printing zeros before number:
+        MOV     CX, 1
+
+        ; (result of "/ 10000" is always less or equal to 9).
+        MOV     BX, 10000       ; 2710h - divider.
+
+        ; AX is zero?
+        CMP     AX, 0
+        JZ      print_zero
+
+begin_print:
+
+        ; check divider (if zero go to end_print):
+        CMP     BX,0
+        JZ      end_print
+
+        ; avoid printing zeros before number:
+        CMP     CX, 0
+        JE      calc
+        ; if AX<BX then result of DIV will be zero:
+        CMP     AX, BX
+        JB      skip
+calc:
+        MOV     CX, 0   ; set flag.
+
+        MOV     DX, 0
+        DIV     BX      ; AX = DX:AX / BX   (DX=remainder).
+
+        ; print last digit
+        ; AH is always ZERO, so it's ignored
+        ADD     AL, 30h    ; convert to ASCII code.
+        PUTC    AL
+
+
+        MOV     AX, DX  ; get remainder from last div.
+
+skip:
+        ; calculate BX=BX/10
+        PUSH    AX
+        MOV     DX, 0
+        MOV     AX, BX
+        DIV     CS:ten  ; AX = DX:AX / 10   (DX=remainder).
+        MOV     BX, AX
+        POP     AX
+
+        JMP     begin_print
+        
+print_zero:
+        PUTC    '0'
+        
+end_print:
+
+        POP     DX
+        POP     CX
+        POP     BX
+        POP     AX
+        RET
+ten             DW      10      ; used as divider.      
+ENDP
+
+
+; print text that follows the caller
+print PROC
+MOV     CS:temp1, SI  ; store SI register.
+POP     SI            ; get return address (IP).
+PUSH    AX            ; store AX register.
+next_char:      
+        MOV     AL, CS:[SI]
+        INC     SI            ; next byte.
+        CMP     AL, 0
+        JZ      printed_ok
+        MOV     AH, 0Eh       ; teletype function.
+        INT     10h
+        JMP     next_char     ; loop.
+printed_ok:
+POP     AX            ; re-store AX register.
+; SI should point to next command after
+; the CALL instruction and string definition:
+PUSH    SI            ; save new return address into the Stack.
+MOV     SI, CS:temp1  ; re-store SI register.
+RET
+temp1  DW  ?    ; variable to store original value of SI register.
+ENDP; Write a program to find the factorial of a number
+
+; this example gets the number from the user,
+; and calculates factorial for it.
+; supported input from 0 to 8 inclusive!
+
+name "fact"
+
+; this macro prints a char in AL and advances
+; the current cursor position:
+putc    macro   char
+        push    ax
+        mov     al, char
+        mov     ah, 0eh
+        int     10h     
+        pop     ax
+endm
+
+
+
+org     100h
+
+jmp start
+
+
+result dw ?
+     
+
+
+start:
+
+; get first number:
+
+mov dx, offset msg1
+mov ah, 9
+int 21h
+jmp n1
+msg1 db 0Dh,0Ah, 'enter the number: $'
+n1:
+
+call    scan_num
+
+
+; factorial of 0 = 1:
+mov     ax, 1
+cmp     cx, 0
+je      print_result
+
+; move the number to bx:
+; cx will be a counter:
+
+mov     bx, cx
+
+mov     ax, 1
+mov     bx, 1
+
+calc_it:
+mul     bx
+cmp     dx, 0
+jne     overflow
+inc     bx
+loop    calc_it
+
+mov result, ax
+
+
+print_result:
+
+; print result in ax:
+mov dx, offset msg2
+mov ah, 9
+int 21h
+jmp n2
+msg2 db 0Dh,0Ah, 'factorial: $'
+n2:
+
+
+mov     ax, result
+call    print_num_uns
+jmp     exit
+
+
+overflow:
+mov dx, offset msg3
+mov ah, 9
+int 21h
+jmp n3
+msg3 db 0Dh,0Ah, 'the result is too big!', 0Dh,0Ah, 'use values from 0 to 8.$'
+n3:
+jmp     start
+
+exit:
+
+; wait for any key press:
+mov ah, 0
+int 16h
+
+ret
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; these functions are copied from emu8086.inc ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+; gets the multi-digit SIGNED number from the keyboard,
+; and stores the result in CX register:
+SCAN_NUM        PROC    NEAR
+        PUSH    DX
+        PUSH    AX
+        PUSH    SI
+        
+        MOV     CX, 0
+
+        ; reset flag:
+        MOV     CS:make_minus, 0
+
+next_digit:
+
+        ; get char from keyboard
+        ; into AL:
+        MOV     AH, 00h
+        INT     16h
+        ; and print it:
+        MOV     AH, 0Eh
+        INT     10h
+
+        ; check for MINUS:
+        CMP     AL, '-'
+        JE      set_minus
+
+        ; check for ENTER key:
+        CMP     AL, 0Dh  ; carriage return?
+        JNE     not_cr
+        JMP     stop_input
+not_cr:
+
+
+        CMP     AL, 8                   ; 'BACKSPACE' pressed?
+        JNE     backspace_checked
+        MOV     DX, 0                   ; remove last digit by
+        MOV     AX, CX                  ; division:
+        DIV     CS:ten                  ; AX = DX:AX / 10 (DX-rem).
+        MOV     CX, AX
+        PUTC    ' '                     ; clear position.
+        PUTC    8                       ; backspace again.
+        JMP     next_digit
+backspace_checked:
+
+
+        ; allow only digits:
+        CMP     AL, '0'
+        JAE     ok_AE_0
+        JMP     remove_not_digit
+ok_AE_0:        
+        CMP     AL, '9'
+        JBE     ok_digit
+remove_not_digit:       
+        PUTC    8       ; backspace.
+        PUTC    ' '     ; clear last entered not digit.
+        PUTC    8       ; backspace again.        
+        JMP     next_digit ; wait for next input.       
+ok_digit:
+
+
+        ; multiply CX by 10 (first time the result is zero)
+        PUSH    AX
+        MOV     AX, CX
+        MUL     CS:ten                  ; DX:AX = AX*10
+        MOV     CX, AX
+        POP     AX
+
+        ; check if the number is too big
+        ; (result should be 16 bits)
+        CMP     DX, 0
+        JNE     too_big
+
+        ; convert from ASCII code:
+        SUB     AL, 30h
+
+        ; add AL to CX:
+        MOV     AH, 0
+        MOV     DX, CX      ; backup, in case the result will be too big.
+        ADD     CX, AX
+        JC      too_big2    ; jump if the number is too big.
+
+        JMP     next_digit
+
+set_minus:
+        MOV     CS:make_minus, 1
+        JMP     next_digit
+
+too_big2:
+        MOV     CX, DX      ; restore the backuped value before add.
+        MOV     DX, 0       ; DX was zero before backup!
+too_big:
+        MOV     AX, CX
+        DIV     CS:ten  ; reverse last DX:AX = AX*10, make AX = DX:AX / 10
+        MOV     CX, AX
+        PUTC    8       ; backspace.
+        PUTC    ' '     ; clear last entered digit.
+        PUTC    8       ; backspace again.        
+        JMP     next_digit ; wait for Enter/Backspace.
+        
+        
+stop_input:
+        ; check flag:
+        CMP     CS:make_minus, 0
+        JE      not_minus
+        NEG     CX
+not_minus:
+
+        POP     SI
+        POP     AX
+        POP     DX
+        RET
+make_minus      DB      ?       ; used as a flag.
+SCAN_NUM        ENDP
+
+
+
+
+
+; this procedure prints number in AX,
+; used with PRINT_NUM_UNS to print signed numbers:
+PRINT_NUM       PROC    NEAR
+        PUSH    DX
+        PUSH    AX
+
+        CMP     AX, 0
+        JNZ     not_zero
+
+        PUTC    '0'
+        JMP     printed
+
+not_zero:
+        ; the check SIGN of AX,
+        ; make absolute if it's negative:
+        CMP     AX, 0
+        JNS     positive
+        NEG     AX
+
+        PUTC    '-'
+
+positive:
+        CALL    PRINT_NUM_UNS
+printed:
+        POP     AX
+        POP     DX
+        RET
+PRINT_NUM       ENDP
+
+
+
+; this procedure prints out an unsigned
+; number in AX (not just a single digit)
+; allowed values are from 0 to 65535 (FFFF)
+PRINT_NUM_UNS   PROC    NEAR
+        PUSH    AX
+        PUSH    BX
+        PUSH    CX
+        PUSH    DX
+
+        ; flag to prevent printing zeros before number:
+        MOV     CX, 1
+
+        ; (result of "/ 10000" is always less or equal to 9).
+        MOV     BX, 10000       ; 2710h - divider.
+
+        ; AX is zero?
+        CMP     AX, 0
+        JZ      print_zero
+
+begin_print:
+
+        ; check divider (if zero go to end_print):
+        CMP     BX,0
+        JZ      end_print
+
+        ; avoid printing zeros before number:
+        CMP     CX, 0
+        JE      calc
+        ; if AX<BX then result of DIV will be zero:
+        CMP     AX, BX
+        JB      skip
+calc:
+        MOV     CX, 0   ; set flag.
+
+        MOV     DX, 0
+        DIV     BX      ; AX = DX:AX / BX   (DX=remainder).
+
+        ; print last digit
+        ; AH is always ZERO, so it's ignored
+        ADD     AL, 30h    ; convert to ASCII code.
+        PUTC    AL
+
+
+        MOV     AX, DX  ; get remainder from last div.
+
+skip:
+        ; calculate BX=BX/10
+        PUSH    AX
+        MOV     DX, 0
+        MOV     AX, BX
+        DIV     CS:ten  ; AX = DX:AX / 10   (DX=remainder).
+        MOV     BX, AX
+        POP     AX
+
+        JMP     begin_print
+        
+print_zero:
+        PUTC    '0'
+        
+end_print:
+
+        POP     DX
+        POP     CX
+        POP     BX
+        POP     AX
+        RET
+PRINT_NUM_UNS   ENDP
+
+
+
+ten             DW      10      ; used as multiplier/divider by SCAN_NUM & PRINT_NUM_UNS.
+
+
+
+
+
+
+
+; Write a program for decimal to binary conversion
+
+org 100h
+
+jmp start
+
+; text data:
+msg1 db 0Dh,0Ah, " enter any number from -32768 to 65535 inclusive, or zero to stop: $"
+msg2 db 0Dh,0Ah, " binary form: $"
+
+; buffer for int 21h/0ah
+; fist byte is buffer size,
+; second byte is number of chars actually read (set by int 21h/0ah).
+buffer db 7,?, 5 dup (0), 0, 0
+
+; for result:
+binary dw ?
+
+start:
+
+; print welcome message:
+mov dx, offset msg1
+mov ah, 9
+int 21h
+
+; input string:
+mov dx, offset buffer
+mov ah, 0ah
+int 21h
+
+; make sure the string is zero terminated:
+mov bx, 0
+mov bl, buffer[1]
+mov buffer[bx+2], 0
+
+
+lea    si, buffer + 2  ; buffer starts from third byte.
+call    tobin
+
+; the number is in cx register.
+; for '-1234' it's 0fb2eh
+
+mov binary, cx
+
+jcxz stop
+
+; print pre-result message:
+mov dx, offset msg2
+mov ah, 9
+int 21h
+
+; print result in binary:
+mov bx, binary
+mov cx, 16
+print: mov ah, 2   ; print function.
+       mov dl, '0'
+       test bx, 1000000000000000b  ; test first bit.
+       jz zero
+       mov dl, '1'
+zero:  int 21h
+       shl bx, 1
+loop print
+; print binary suffix:
+mov dl, 'b'
+int 21h
+
+jmp start  ; loop
+
+stop:
+
+ret ; return control to the operating system.
+
+
+
+; this procedure converts string number to
+; binary number. number can have a sign ('-').
+; the result is stored in cx register.
+; parameters:
+; si - address of string number (zero terminated).
+
+tobin   proc    near
+        push    dx
+        push    ax
+        push    si
+   
+   
+jmp process
+       
+;==== local variables ====      
+make_minus      db      ?       ; used as a flag.
+ten             dw      10      ; used as multiplier.
+;=========================
+
+process:       
+
+        ; reset the accumulator:
+        mov     cx, 0
+
+        ; reset flag:
+        mov     cs:make_minus, 0
+
+next_digit:
+
+    ; read char to al and
+    ; point to next byte:
+    mov     al, [si]
+    inc    si     
+
+        ; check for end of string:
+        cmp     al, 0  ; end of string?
+        jne     not_end
+        jmp     stop_input       
+not_end:
+
+        ; check for minus:
+        cmp     al, '-'
+        jne     ok_digit
+        mov     cs:make_minus, 1 ; set flag!
+    jmp     next_digit
+   
+ok_digit:
+
+        ; multiply cx by 10 (first time the result is zero)
+        push    ax
+        mov     ax, cx
+        mul     cs:ten                  ; dx:ax = ax*10
+        mov     cx, ax
+        pop     ax
+
+    ; it is assumed that dx is zero - overflow not checked!
+
+        ; convert from ascii code:
+        sub     al, 30h
+
+        ; add al to cx:
+        mov     ah, 0
+        mov     dx, cx      ; backup, in case the result will be too big.
+        add     cx, ax
+       
+        ; add - overflow not checked!
+
+        jmp     next_digit
+
+stop_input:
+
+        ; check flag, if string number had '-'
+        ; make sure the result is negative:
+        cmp     cs:make_minus, 0
+        je      not_minus
+        neg     cx
+       
+not_minus:
+
+        pop     si
+        pop     ax
+        pop     dx
+        ret
+tobin        endp
